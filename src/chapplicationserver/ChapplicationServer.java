@@ -1,16 +1,7 @@
 package chapplicationserver;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.ArrayList;
-import java.util.InputMismatchException;
-import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import chapplicationserver.GUI.LoginGUI;
+import java.sql.*;
 
 /**
  * @author james.wolff
@@ -20,78 +11,33 @@ public class ChapplicationServer {
     /**
      * @param args the command line arguments
      */
+    private static Statement stmt;
+    private static String url, username, password;
+    private static Connection con;
+    @SuppressWarnings("empty-statement")
     public static void main(String[] args) {
-        ArrayList<String> users;
-        users = new ArrayList<>();
-        PrintWriter out = null;
-        Scanner scan=new Scanner(System.in);
-        int port=-1;
-        try {
-            ServerSocket ss=null;
-            while(port==-1){
-                System.out.print("Input a port between 0-55555: ");
-                try{
-                    port=scan.nextInt();
-                }catch(InputMismatchException e){
-                    System.out.println("That is not a number!");
-                    System.exit(1);
-                }
-                if(port>0&&port<55555){
-                    break;
-                }else{
-                    System.out.println("That number is out of range!");
-                    port=-1;
-                }
+        final LoginGUI l=new LoginGUI();
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                new LoginGUI().setVisible(true);
             }
-            try{
-                ss=new ServerSocket(port);
-            }catch(IOException e){
-                System.err.println("Could not listen on port: 4444.");
-                System.exit(1);
-            }
-            Socket s=null;
-            try{
-                s=ss.accept();
-            }catch(IOException e){
-                System.err.println("Accept Failed!");
-                System.exit(1);
-            }
-            out = new PrintWriter(s.getOutputStream(), true);
-            BufferedReader in=new BufferedReader(new InputStreamReader(s.getInputStream()));
-            String input;
-            Protocol p=new Protocol();
-            int i;
-            while((input=in.readLine())!=null){
-                i=p.processInput(input);
-                if(i==0||i==1){
-                    input=input.substring(3);
-                    if(i==0){
-                        users.add(input);
-                        out.println("-u"+input+"-mWelcome "+input+" to the chat!");
-                    }else{
-                        users.remove(input);
-                        out.println("-u+"+input+"-m"+input+" left.");
-                    }
-                }else if(i==2){
-                    //TODO Add user to mysql database
-                }else if(i==3){
-                    out.println(input);
-                }
-            }
-            out.close();
-            try {
-                in.close();
-                s.close();
-            } catch (IOException ex) {
-                Logger.getLogger(ChapplicationServer.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            ss.close();
-        } catch (IOException ex) {
-            Logger.getLogger(ChapplicationServer.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            out.close();
-        }
-
+        });
+        while(l.isVisible());
     }
-
+    public static boolean connect(String user, String pass) throws ClassNotFoundException, SQLException{
+        username=user;
+        password=pass;
+        Class.forName("com.mysql.jdbc.Driver");
+        url = "jdbc:mysql://92.82.64.168:4444/mysql";
+        con = DriverManager.getConnection( url,username,password);
+        return true;
+    }
+    /*
+     * @param sqlCommand and String SQL Command eg. SELECT * FROM users
+     */
+    public static void executeUpdate(String sqlCommand) throws SQLException{
+        stmt=con.createStatement();
+        stmt.executeUpdate(sqlCommand);
+    }
 }
