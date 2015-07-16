@@ -14,7 +14,6 @@ public class ChapplicationServer {
     private static Statement stmt;
     private static String url, username, password;
     private static Connection con;
-    @SuppressWarnings("empty-statement")
     public static void main(String[] args) {
         final LoginGUI l=new LoginGUI();
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -25,12 +24,11 @@ public class ChapplicationServer {
         });
         while(l.isVisible());
     }
-    public static boolean connect(String user, String pass) throws ClassNotFoundException, SQLException{
+    public static boolean connect(String user, String pass) throws SQLException{
         username=user;
         password=pass;
-        Class.forName("com.mysql.jdbc.Driver");
-        url = "jdbc:mysql://92.82.64.168:4444/mysql";
-        con = DriverManager.getConnection( url,username,password);
+        url = "jdbc:mysql://localhost:3306/chapplication?";
+        con = DriverManager.getConnection(url,username,password);
         return true;
     }
     /*

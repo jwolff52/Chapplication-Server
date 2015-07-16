@@ -149,7 +149,7 @@ public class LoginGUI extends javax.swing.JFrame {
             if(ChapplicationServer.connect(userField.getText(), passField.getText())){
                 this.dispose();
             }
-        } catch (ClassNotFoundException | SQLException ex) {
+        } catch (SQLException ex) {
             Logger.getLogger(LoginGUI.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_loginButtonMouseReleased
